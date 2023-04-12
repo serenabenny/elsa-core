@@ -16,7 +16,17 @@ namespace Elsa.Activities.Http.JavaScript
     public class HttpEndpointTypeDefinitionRenderer : DefaultActivityTypeDefinitionRenderer
     {
         public override bool GetCanRenderType(ActivityType activityType) => activityType.Type == typeof(HttpEndpoint);
+        
+        private static string FirstLetterToUpperCase(string str)
+        {
+            if (string.IsNullOrEmpty(str))
+                return str;
 
+            var a = str.ToCharArray();
+            a[0] = char.ToUpper(a[0]);
+            return new string(a);
+        }
+        
         public override async ValueTask RenderTypeDeclarationAsync(
             RenderingTypeScriptDefinitions notification,
             ActivityType activityType,
@@ -64,8 +74,8 @@ namespace Elsa.Activities.Http.JavaScript
                 return;
             }
 
-            var targetTypeName = activityDefinition.Properties.First(x => x.Name == nameof(HttpEndpoint.TargetType)).Expressions.Values.FirstOrDefault();
-            var targetTypeSchema = activityDefinition.Properties.First(x => x.Name == nameof(HttpEndpoint.Schema)).Expressions.Values.FirstOrDefault();
+            var targetTypeName = activityDefinition.Properties.FirstOrDefault(x => x.Name == nameof(HttpEndpoint.TargetType))?.Expressions.Values.FirstOrDefault();
+            var targetTypeSchema = activityDefinition.Properties.FirstOrDefault(x => x.Name == nameof(HttpEndpoint.Schema))?.Expressions.Values.FirstOrDefault();
             var typeScriptType = notification.GetTypeScriptType(propertyType);
 
             if (!string.IsNullOrWhiteSpace(targetTypeName))
@@ -77,7 +87,7 @@ namespace Elsa.Activities.Http.JavaScript
             }
             else if (!string.IsNullOrWhiteSpace(targetTypeSchema))
             {
-                typeScriptType = $"{activityDefinition.Name}Output";
+                typeScriptType = FirstLetterToUpperCase($"{activityDefinition.Name}Output");
             }
 
             writer.AppendLine($"{propertyName}(): {typeScriptType}");

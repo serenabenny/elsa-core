@@ -5,7 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { ActivityDefinitionProperty, ActivityDescriptor, ActivityModel, ActivityPropertyDescriptor, ElsaStudio, IntellisenseContext, OrderBy, SelectListItem, VersionOptions, WorkflowBlueprint, WorkflowDefinition, WorkflowDefinitionVersion, WorkflowExecutionLogRecord, WorkflowFault, WorkflowInstance, WorkflowModel, WorkflowStatus } from "./models";
+import { ActivityDefinitionProperty, ActivityDeletedArgs, ActivityDescriptor, ActivityModel, ActivityPropertyDescriptor, ElsaStudio, IntellisenseContext, OrderBy, SelectListItem, VersionOptions, WorkflowBlueprint, WorkflowDefinition, WorkflowDefinitionVersion, WorkflowExecutionLogRecord, WorkflowFault, WorkflowInstance, WorkflowModel, WorkflowStatus } from "./models";
 import { LocationSegments, MatchResults, RouterHistory } from "@stencil/router";
 import { MenuItem } from "./components/controls/elsa-context-menu/models";
 import { VNode } from "@stencil/core";
@@ -19,6 +19,9 @@ import { WebhookDefinition } from "./modules/elsa-webhooks/models";
 import { ActivityStats } from ".";
 export namespace Components {
     interface ElsaActivityEditorModal {
+        "culture": string;
+    }
+    interface ElsaActivityEditorPanel {
         "culture": string;
     }
     interface ElsaActivityPickerModal {
@@ -48,6 +51,18 @@ export namespace Components {
     }
     interface ElsaCopyButton {
         "value": string;
+    }
+    interface ElsaCredentialManagerItemsList {
+        "basePath": string;
+        "culture": string;
+        "monacoLibPath": string;
+        "serverUrl": string;
+    }
+    interface ElsaCredentialManagerListScreen {
+        "basePath": string;
+        "culture": string;
+        "history"?: RouterHistory;
+        "serverUrl": string;
     }
     interface ElsaCronExpressionProperty {
         "activityModel": ActivityModel;
@@ -79,6 +94,7 @@ export namespace Components {
         "serverUrl": string;
     }
     interface ElsaDropdownButton {
+        "btnClass"?: string;
         "icon"?: any;
         "items": Array<DropdownButtonItem>;
         "origin": DropdownButtonOrigin;
@@ -95,6 +111,7 @@ export namespace Components {
         "editorHeight": string;
         "expression": string;
         "language": string;
+        "opensModal": boolean;
         "padding": string;
         "serverUrl": string;
         "setExpression": (value: string) => Promise<void>;
@@ -102,8 +119,12 @@ export namespace Components {
         "workflowDefinitionId": string;
     }
     interface ElsaFlyoutPanel {
+        "autoExpand": boolean;
         "expandButtonPosition": number;
+        "hidden": boolean;
         "selectTab": (tab: string, expand?: boolean) => Promise<void>;
+        "silent": boolean;
+        "updateCounter": number;
     }
     interface ElsaInputTags {
         "fieldId"?: string;
@@ -160,6 +181,8 @@ export namespace Components {
         "propertyModel": ActivityDefinitionProperty;
         "serverUrl": string;
     }
+    interface ElsaOauth2Authorized {
+    }
     interface ElsaPager {
         "culture": string;
         "history"?: RouterHistory;
@@ -193,6 +216,13 @@ export namespace Components {
         "syntax"?: string;
         "workflowDefinitionId": string;
     }
+    interface ElsaSecretEditorModal {
+        "culture": string;
+        "monacoLibPath": string;
+        "serverUrl": string;
+    }
+    interface ElsaSecretsPickerModal {
+    }
     interface ElsaSingleLineProperty {
         "activityModel": ActivityModel;
         "propertyDescriptor": ActivityPropertyDescriptor;
@@ -204,6 +234,7 @@ export namespace Components {
     }
     interface ElsaStudioHome {
         "culture": string;
+        "serverVersion": string;
     }
     interface ElsaStudioRoot {
         "addPlugin": (pluginType: any) => Promise<void>;
@@ -214,6 +245,7 @@ export namespace Components {
         "features": any;
         "monacoLibPath": string;
         "serverUrl": string;
+        "useX6Graphs": boolean;
     }
     interface ElsaStudioWebhookDefinitionsEdit {
         "match": MatchResults;
@@ -259,6 +291,10 @@ export namespace Components {
     interface ElsaToastNotification {
         "hide": () => Promise<void>;
         "show": (options: ToastNotificationOptions) => Promise<void>;
+    }
+    interface ElsaUserContextMenu {
+        "menuItemSelected": (item: DropdownButtonItem) => Promise<void>;
+        "serverUrl": string;
     }
     interface ElsaVersionHistoryPanel {
         "serverUrl": string;
@@ -370,9 +406,26 @@ export namespace Components {
     }
     interface ElsaWorkflowTestPanel {
         "culture": string;
+        "selectedActivityId"?: string;
         "serverUrl": string;
         "workflowDefinition": WorkflowDefinition;
         "workflowTestActivityId": string;
+    }
+    interface X6Designer {
+        "activityBorderColor"?: (activity: ActivityModel) => string;
+        "activityContextMenu"?: ActivityContextMenuState;
+        "activityContextMenuButton"?: (activity: ActivityModel) => string;
+        "activityContextTestMenu"?: ActivityContextMenuState;
+        "connectionContextMenu"?: ActivityContextMenuState;
+        "enableMultipleConnectionsFromSingleSource": boolean;
+        "layoutDirection": LayoutDirection;
+        "mode": WorkflowDesignerMode;
+        "model": WorkflowModel;
+        "removeActivity": (activity: ActivityModel) => Promise<void>;
+        "removeSelectedActivities": () => Promise<void>;
+        "selectedActivityIds": Array<string>;
+        "showActivityEditor": (activity: ActivityModel, animate: boolean) => Promise<void>;
+        "updateLayout": () => Promise<void>;
     }
 }
 declare global {
@@ -381,6 +434,12 @@ declare global {
     var HTMLElsaActivityEditorModalElement: {
         prototype: HTMLElsaActivityEditorModalElement;
         new (): HTMLElsaActivityEditorModalElement;
+    };
+    interface HTMLElsaActivityEditorPanelElement extends Components.ElsaActivityEditorPanel, HTMLStencilElement {
+    }
+    var HTMLElsaActivityEditorPanelElement: {
+        prototype: HTMLElsaActivityEditorPanelElement;
+        new (): HTMLElsaActivityEditorPanelElement;
     };
     interface HTMLElsaActivityPickerModalElement extends Components.ElsaActivityPickerModal, HTMLStencilElement {
     }
@@ -423,6 +482,18 @@ declare global {
     var HTMLElsaCopyButtonElement: {
         prototype: HTMLElsaCopyButtonElement;
         new (): HTMLElsaCopyButtonElement;
+    };
+    interface HTMLElsaCredentialManagerItemsListElement extends Components.ElsaCredentialManagerItemsList, HTMLStencilElement {
+    }
+    var HTMLElsaCredentialManagerItemsListElement: {
+        prototype: HTMLElsaCredentialManagerItemsListElement;
+        new (): HTMLElsaCredentialManagerItemsListElement;
+    };
+    interface HTMLElsaCredentialManagerListScreenElement extends Components.ElsaCredentialManagerListScreen, HTMLStencilElement {
+    }
+    var HTMLElsaCredentialManagerListScreenElement: {
+        prototype: HTMLElsaCredentialManagerListScreenElement;
+        new (): HTMLElsaCredentialManagerListScreenElement;
     };
     interface HTMLElsaCronExpressionPropertyElement extends Components.ElsaCronExpressionProperty, HTMLStencilElement {
     }
@@ -520,6 +591,12 @@ declare global {
         prototype: HTMLElsaMultiTextPropertyElement;
         new (): HTMLElsaMultiTextPropertyElement;
     };
+    interface HTMLElsaOauth2AuthorizedElement extends Components.ElsaOauth2Authorized, HTMLStencilElement {
+    }
+    var HTMLElsaOauth2AuthorizedElement: {
+        prototype: HTMLElsaOauth2AuthorizedElement;
+        new (): HTMLElsaOauth2AuthorizedElement;
+    };
     interface HTMLElsaPagerElement extends Components.ElsaPager, HTMLStencilElement {
     }
     var HTMLElsaPagerElement: {
@@ -543,6 +620,18 @@ declare global {
     var HTMLElsaScriptPropertyElement: {
         prototype: HTMLElsaScriptPropertyElement;
         new (): HTMLElsaScriptPropertyElement;
+    };
+    interface HTMLElsaSecretEditorModalElement extends Components.ElsaSecretEditorModal, HTMLStencilElement {
+    }
+    var HTMLElsaSecretEditorModalElement: {
+        prototype: HTMLElsaSecretEditorModalElement;
+        new (): HTMLElsaSecretEditorModalElement;
+    };
+    interface HTMLElsaSecretsPickerModalElement extends Components.ElsaSecretsPickerModal, HTMLStencilElement {
+    }
+    var HTMLElsaSecretsPickerModalElement: {
+        prototype: HTMLElsaSecretsPickerModalElement;
+        new (): HTMLElsaSecretsPickerModalElement;
     };
     interface HTMLElsaSingleLinePropertyElement extends Components.ElsaSingleLineProperty, HTMLStencilElement {
     }
@@ -639,6 +728,12 @@ declare global {
     var HTMLElsaToastNotificationElement: {
         prototype: HTMLElsaToastNotificationElement;
         new (): HTMLElsaToastNotificationElement;
+    };
+    interface HTMLElsaUserContextMenuElement extends Components.ElsaUserContextMenu, HTMLStencilElement {
+    }
+    var HTMLElsaUserContextMenuElement: {
+        prototype: HTMLElsaUserContextMenuElement;
+        new (): HTMLElsaUserContextMenuElement;
     };
     interface HTMLElsaVersionHistoryPanelElement extends Components.ElsaVersionHistoryPanel, HTMLStencilElement {
     }
@@ -754,8 +849,15 @@ declare global {
         prototype: HTMLElsaWorkflowTestPanelElement;
         new (): HTMLElsaWorkflowTestPanelElement;
     };
+    interface HTMLX6DesignerElement extends Components.X6Designer, HTMLStencilElement {
+    }
+    var HTMLX6DesignerElement: {
+        prototype: HTMLX6DesignerElement;
+        new (): HTMLX6DesignerElement;
+    };
     interface HTMLElementTagNameMap {
         "elsa-activity-editor-modal": HTMLElsaActivityEditorModalElement;
+        "elsa-activity-editor-panel": HTMLElsaActivityEditorPanelElement;
         "elsa-activity-picker-modal": HTMLElsaActivityPickerModalElement;
         "elsa-check-list-property": HTMLElsaCheckListPropertyElement;
         "elsa-checkbox-property": HTMLElsaCheckboxPropertyElement;
@@ -763,6 +865,8 @@ declare global {
         "elsa-context-menu": HTMLElsaContextMenuElement;
         "elsa-control": HTMLElsaControlElement;
         "elsa-copy-button": HTMLElsaCopyButtonElement;
+        "elsa-credential-manager-items-list": HTMLElsaCredentialManagerItemsListElement;
+        "elsa-credential-manager-list-screen": HTMLElsaCredentialManagerListScreenElement;
         "elsa-cron-expression-property": HTMLElsaCronExpressionPropertyElement;
         "elsa-designer-panel": HTMLElsaDesignerPanelElement;
         "elsa-designer-tree": HTMLElsaDesignerTreeElement;
@@ -779,10 +883,13 @@ declare global {
         "elsa-multi-expression-editor": HTMLElsaMultiExpressionEditorElement;
         "elsa-multi-line-property": HTMLElsaMultiLinePropertyElement;
         "elsa-multi-text-property": HTMLElsaMultiTextPropertyElement;
+        "elsa-oauth2-authorized": HTMLElsaOauth2AuthorizedElement;
         "elsa-pager": HTMLElsaPagerElement;
         "elsa-property-editor": HTMLElsaPropertyEditorElement;
         "elsa-radio-list-property": HTMLElsaRadioListPropertyElement;
         "elsa-script-property": HTMLElsaScriptPropertyElement;
+        "elsa-secret-editor-modal": HTMLElsaSecretEditorModalElement;
+        "elsa-secrets-picker-modal": HTMLElsaSecretsPickerModalElement;
         "elsa-single-line-property": HTMLElsaSingleLinePropertyElement;
         "elsa-studio-dashboard": HTMLElsaStudioDashboardElement;
         "elsa-studio-home": HTMLElsaStudioHomeElement;
@@ -799,6 +906,7 @@ declare global {
         "elsa-tab-content": HTMLElsaTabContentElement;
         "elsa-tab-header": HTMLElsaTabHeaderElement;
         "elsa-toast-notification": HTMLElsaToastNotificationElement;
+        "elsa-user-context-menu": HTMLElsaUserContextMenuElement;
         "elsa-version-history-panel": HTMLElsaVersionHistoryPanelElement;
         "elsa-webhook-definition-editor-notifications": HTMLElsaWebhookDefinitionEditorNotificationsElement;
         "elsa-webhook-definition-editor-screen": HTMLElsaWebhookDefinitionEditorScreenElement;
@@ -818,10 +926,14 @@ declare global {
         "elsa-workflow-registry-list-screen": HTMLElsaWorkflowRegistryListScreenElement;
         "elsa-workflow-settings-modal": HTMLElsaWorkflowSettingsModalElement;
         "elsa-workflow-test-panel": HTMLElsaWorkflowTestPanelElement;
+        "x6-designer": HTMLX6DesignerElement;
     }
 }
 declare namespace LocalJSX {
     interface ElsaActivityEditorModal {
+        "culture"?: string;
+    }
+    interface ElsaActivityEditorPanel {
         "culture"?: string;
     }
     interface ElsaActivityPickerModal {
@@ -849,6 +961,18 @@ declare namespace LocalJSX {
     }
     interface ElsaCopyButton {
         "value"?: string;
+    }
+    interface ElsaCredentialManagerItemsList {
+        "basePath"?: string;
+        "culture"?: string;
+        "monacoLibPath"?: string;
+        "serverUrl"?: string;
+    }
+    interface ElsaCredentialManagerListScreen {
+        "basePath"?: string;
+        "culture"?: string;
+        "history"?: RouterHistory;
+        "serverUrl"?: string;
     }
     interface ElsaCronExpressionProperty {
         "activityModel"?: ActivityModel;
@@ -885,6 +1009,7 @@ declare namespace LocalJSX {
         "serverUrl"?: string;
     }
     interface ElsaDropdownButton {
+        "btnClass"?: string;
         "icon"?: any;
         "items"?: Array<DropdownButtonItem>;
         "onItemSelected"?: (event: CustomEvent<DropdownButtonItem>) => void;
@@ -903,13 +1028,18 @@ declare namespace LocalJSX {
         "expression"?: string;
         "language"?: string;
         "onExpressionChanged"?: (event: CustomEvent<string>) => void;
+        "opensModal"?: boolean;
         "padding"?: string;
         "serverUrl"?: string;
         "singleLineMode"?: boolean;
         "workflowDefinitionId"?: string;
     }
     interface ElsaFlyoutPanel {
+        "autoExpand"?: boolean;
         "expandButtonPosition"?: number;
+        "hidden"?: boolean;
+        "silent"?: boolean;
+        "updateCounter"?: number;
     }
     interface ElsaInputTags {
         "fieldId"?: string;
@@ -965,9 +1095,12 @@ declare namespace LocalJSX {
     }
     interface ElsaMultiTextProperty {
         "activityModel"?: ActivityModel;
+        "onValueChange"?: (event: CustomEvent<Array<string | number | boolean | SelectListItem>>) => void;
         "propertyDescriptor"?: ActivityPropertyDescriptor;
         "propertyModel"?: ActivityDefinitionProperty;
         "serverUrl"?: string;
+    }
+    interface ElsaOauth2Authorized {
     }
     interface ElsaPager {
         "culture"?: string;
@@ -1004,6 +1137,13 @@ declare namespace LocalJSX {
         "syntax"?: string;
         "workflowDefinitionId"?: string;
     }
+    interface ElsaSecretEditorModal {
+        "culture"?: string;
+        "monacoLibPath"?: string;
+        "serverUrl"?: string;
+    }
+    interface ElsaSecretsPickerModal {
+    }
     interface ElsaSingleLineProperty {
         "activityModel"?: ActivityModel;
         "propertyDescriptor"?: ActivityPropertyDescriptor;
@@ -1015,6 +1155,7 @@ declare namespace LocalJSX {
     }
     interface ElsaStudioHome {
         "culture"?: string;
+        "serverVersion"?: string;
     }
     interface ElsaStudioRoot {
         "basePath"?: string;
@@ -1025,6 +1166,7 @@ declare namespace LocalJSX {
         "onInitialized"?: (event: CustomEvent<ElsaStudio>) => void;
         "onInitializing"?: (event: CustomEvent<ElsaStudio>) => void;
         "serverUrl"?: string;
+        "useX6Graphs"?: boolean;
     }
     interface ElsaStudioWebhookDefinitionsEdit {
         "match"?: MatchResults;
@@ -1056,6 +1198,7 @@ declare namespace LocalJSX {
     }
     interface ElsaSwitchCasesProperty {
         "activityModel"?: ActivityModel;
+        "onValueChange"?: (event: CustomEvent<Array<any>>) => void;
         "propertyDescriptor"?: ActivityPropertyDescriptor;
         "propertyModel"?: ActivityDefinitionProperty;
     }
@@ -1068,6 +1211,9 @@ declare namespace LocalJSX {
         "tab"?: string;
     }
     interface ElsaToastNotification {
+    }
+    interface ElsaUserContextMenu {
+        "serverUrl"?: string;
     }
     interface ElsaVersionHistoryPanel {
         "onDeleteVersionClicked"?: (event: CustomEvent<WorkflowDefinitionVersion>) => void;
@@ -1158,6 +1304,7 @@ declare namespace LocalJSX {
     }
     interface ElsaWorkflowPublishButton {
         "culture"?: string;
+        "onDeleteClicked"?: (event: CustomEvent<any>) => void;
         "onExportClicked"?: (event: CustomEvent<any>) => void;
         "onImportClicked"?: (event: CustomEvent<File>) => void;
         "onPublishClicked"?: (event: CustomEvent<any>) => void;
@@ -1178,12 +1325,33 @@ declare namespace LocalJSX {
     }
     interface ElsaWorkflowTestPanel {
         "culture"?: string;
+        "selectedActivityId"?: string;
         "serverUrl"?: string;
         "workflowDefinition"?: WorkflowDefinition;
         "workflowTestActivityId"?: string;
     }
+    interface X6Designer {
+        "activityBorderColor"?: (activity: ActivityModel) => string;
+        "activityContextMenu"?: ActivityContextMenuState;
+        "activityContextMenuButton"?: (activity: ActivityModel) => string;
+        "activityContextTestMenu"?: ActivityContextMenuState;
+        "connectionContextMenu"?: ActivityContextMenuState;
+        "enableMultipleConnectionsFromSingleSource"?: boolean;
+        "layoutDirection"?: LayoutDirection;
+        "mode"?: WorkflowDesignerMode;
+        "model"?: WorkflowModel;
+        "onActivityContextMenuButtonClicked"?: (event: CustomEvent<ActivityContextMenuState>) => void;
+        "onActivityContextMenuButtonTestClicked"?: (event: CustomEvent<ActivityContextMenuState>) => void;
+        "onActivityDeleted"?: (event: CustomEvent<ActivityDeletedArgs>) => void;
+        "onActivityDeselected"?: (event: CustomEvent<ActivityModel>) => void;
+        "onActivitySelected"?: (event: CustomEvent<ActivityModel>) => void;
+        "onConnectionContextMenuButtonClicked"?: (event: CustomEvent<ActivityContextMenuState>) => void;
+        "onWorkflow-changed"?: (event: CustomEvent<WorkflowModel>) => void;
+        "selectedActivityIds"?: Array<string>;
+    }
     interface IntrinsicElements {
         "elsa-activity-editor-modal": ElsaActivityEditorModal;
+        "elsa-activity-editor-panel": ElsaActivityEditorPanel;
         "elsa-activity-picker-modal": ElsaActivityPickerModal;
         "elsa-check-list-property": ElsaCheckListProperty;
         "elsa-checkbox-property": ElsaCheckboxProperty;
@@ -1191,6 +1359,8 @@ declare namespace LocalJSX {
         "elsa-context-menu": ElsaContextMenu;
         "elsa-control": ElsaControl;
         "elsa-copy-button": ElsaCopyButton;
+        "elsa-credential-manager-items-list": ElsaCredentialManagerItemsList;
+        "elsa-credential-manager-list-screen": ElsaCredentialManagerListScreen;
         "elsa-cron-expression-property": ElsaCronExpressionProperty;
         "elsa-designer-panel": ElsaDesignerPanel;
         "elsa-designer-tree": ElsaDesignerTree;
@@ -1207,10 +1377,13 @@ declare namespace LocalJSX {
         "elsa-multi-expression-editor": ElsaMultiExpressionEditor;
         "elsa-multi-line-property": ElsaMultiLineProperty;
         "elsa-multi-text-property": ElsaMultiTextProperty;
+        "elsa-oauth2-authorized": ElsaOauth2Authorized;
         "elsa-pager": ElsaPager;
         "elsa-property-editor": ElsaPropertyEditor;
         "elsa-radio-list-property": ElsaRadioListProperty;
         "elsa-script-property": ElsaScriptProperty;
+        "elsa-secret-editor-modal": ElsaSecretEditorModal;
+        "elsa-secrets-picker-modal": ElsaSecretsPickerModal;
         "elsa-single-line-property": ElsaSingleLineProperty;
         "elsa-studio-dashboard": ElsaStudioDashboard;
         "elsa-studio-home": ElsaStudioHome;
@@ -1227,6 +1400,7 @@ declare namespace LocalJSX {
         "elsa-tab-content": ElsaTabContent;
         "elsa-tab-header": ElsaTabHeader;
         "elsa-toast-notification": ElsaToastNotification;
+        "elsa-user-context-menu": ElsaUserContextMenu;
         "elsa-version-history-panel": ElsaVersionHistoryPanel;
         "elsa-webhook-definition-editor-notifications": ElsaWebhookDefinitionEditorNotifications;
         "elsa-webhook-definition-editor-screen": ElsaWebhookDefinitionEditorScreen;
@@ -1246,6 +1420,7 @@ declare namespace LocalJSX {
         "elsa-workflow-registry-list-screen": ElsaWorkflowRegistryListScreen;
         "elsa-workflow-settings-modal": ElsaWorkflowSettingsModal;
         "elsa-workflow-test-panel": ElsaWorkflowTestPanel;
+        "x6-designer": X6Designer;
     }
 }
 export { LocalJSX as JSX };
@@ -1253,6 +1428,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "elsa-activity-editor-modal": LocalJSX.ElsaActivityEditorModal & JSXBase.HTMLAttributes<HTMLElsaActivityEditorModalElement>;
+            "elsa-activity-editor-panel": LocalJSX.ElsaActivityEditorPanel & JSXBase.HTMLAttributes<HTMLElsaActivityEditorPanelElement>;
             "elsa-activity-picker-modal": LocalJSX.ElsaActivityPickerModal & JSXBase.HTMLAttributes<HTMLElsaActivityPickerModalElement>;
             "elsa-check-list-property": LocalJSX.ElsaCheckListProperty & JSXBase.HTMLAttributes<HTMLElsaCheckListPropertyElement>;
             "elsa-checkbox-property": LocalJSX.ElsaCheckboxProperty & JSXBase.HTMLAttributes<HTMLElsaCheckboxPropertyElement>;
@@ -1260,6 +1436,8 @@ declare module "@stencil/core" {
             "elsa-context-menu": LocalJSX.ElsaContextMenu & JSXBase.HTMLAttributes<HTMLElsaContextMenuElement>;
             "elsa-control": LocalJSX.ElsaControl & JSXBase.HTMLAttributes<HTMLElsaControlElement>;
             "elsa-copy-button": LocalJSX.ElsaCopyButton & JSXBase.HTMLAttributes<HTMLElsaCopyButtonElement>;
+            "elsa-credential-manager-items-list": LocalJSX.ElsaCredentialManagerItemsList & JSXBase.HTMLAttributes<HTMLElsaCredentialManagerItemsListElement>;
+            "elsa-credential-manager-list-screen": LocalJSX.ElsaCredentialManagerListScreen & JSXBase.HTMLAttributes<HTMLElsaCredentialManagerListScreenElement>;
             "elsa-cron-expression-property": LocalJSX.ElsaCronExpressionProperty & JSXBase.HTMLAttributes<HTMLElsaCronExpressionPropertyElement>;
             "elsa-designer-panel": LocalJSX.ElsaDesignerPanel & JSXBase.HTMLAttributes<HTMLElsaDesignerPanelElement>;
             "elsa-designer-tree": LocalJSX.ElsaDesignerTree & JSXBase.HTMLAttributes<HTMLElsaDesignerTreeElement>;
@@ -1276,10 +1454,13 @@ declare module "@stencil/core" {
             "elsa-multi-expression-editor": LocalJSX.ElsaMultiExpressionEditor & JSXBase.HTMLAttributes<HTMLElsaMultiExpressionEditorElement>;
             "elsa-multi-line-property": LocalJSX.ElsaMultiLineProperty & JSXBase.HTMLAttributes<HTMLElsaMultiLinePropertyElement>;
             "elsa-multi-text-property": LocalJSX.ElsaMultiTextProperty & JSXBase.HTMLAttributes<HTMLElsaMultiTextPropertyElement>;
+            "elsa-oauth2-authorized": LocalJSX.ElsaOauth2Authorized & JSXBase.HTMLAttributes<HTMLElsaOauth2AuthorizedElement>;
             "elsa-pager": LocalJSX.ElsaPager & JSXBase.HTMLAttributes<HTMLElsaPagerElement>;
             "elsa-property-editor": LocalJSX.ElsaPropertyEditor & JSXBase.HTMLAttributes<HTMLElsaPropertyEditorElement>;
             "elsa-radio-list-property": LocalJSX.ElsaRadioListProperty & JSXBase.HTMLAttributes<HTMLElsaRadioListPropertyElement>;
             "elsa-script-property": LocalJSX.ElsaScriptProperty & JSXBase.HTMLAttributes<HTMLElsaScriptPropertyElement>;
+            "elsa-secret-editor-modal": LocalJSX.ElsaSecretEditorModal & JSXBase.HTMLAttributes<HTMLElsaSecretEditorModalElement>;
+            "elsa-secrets-picker-modal": LocalJSX.ElsaSecretsPickerModal & JSXBase.HTMLAttributes<HTMLElsaSecretsPickerModalElement>;
             "elsa-single-line-property": LocalJSX.ElsaSingleLineProperty & JSXBase.HTMLAttributes<HTMLElsaSingleLinePropertyElement>;
             "elsa-studio-dashboard": LocalJSX.ElsaStudioDashboard & JSXBase.HTMLAttributes<HTMLElsaStudioDashboardElement>;
             "elsa-studio-home": LocalJSX.ElsaStudioHome & JSXBase.HTMLAttributes<HTMLElsaStudioHomeElement>;
@@ -1296,6 +1477,7 @@ declare module "@stencil/core" {
             "elsa-tab-content": LocalJSX.ElsaTabContent & JSXBase.HTMLAttributes<HTMLElsaTabContentElement>;
             "elsa-tab-header": LocalJSX.ElsaTabHeader & JSXBase.HTMLAttributes<HTMLElsaTabHeaderElement>;
             "elsa-toast-notification": LocalJSX.ElsaToastNotification & JSXBase.HTMLAttributes<HTMLElsaToastNotificationElement>;
+            "elsa-user-context-menu": LocalJSX.ElsaUserContextMenu & JSXBase.HTMLAttributes<HTMLElsaUserContextMenuElement>;
             "elsa-version-history-panel": LocalJSX.ElsaVersionHistoryPanel & JSXBase.HTMLAttributes<HTMLElsaVersionHistoryPanelElement>;
             "elsa-webhook-definition-editor-notifications": LocalJSX.ElsaWebhookDefinitionEditorNotifications & JSXBase.HTMLAttributes<HTMLElsaWebhookDefinitionEditorNotificationsElement>;
             "elsa-webhook-definition-editor-screen": LocalJSX.ElsaWebhookDefinitionEditorScreen & JSXBase.HTMLAttributes<HTMLElsaWebhookDefinitionEditorScreenElement>;
@@ -1315,6 +1497,7 @@ declare module "@stencil/core" {
             "elsa-workflow-registry-list-screen": LocalJSX.ElsaWorkflowRegistryListScreen & JSXBase.HTMLAttributes<HTMLElsaWorkflowRegistryListScreenElement>;
             "elsa-workflow-settings-modal": LocalJSX.ElsaWorkflowSettingsModal & JSXBase.HTMLAttributes<HTMLElsaWorkflowSettingsModalElement>;
             "elsa-workflow-test-panel": LocalJSX.ElsaWorkflowTestPanel & JSXBase.HTMLAttributes<HTMLElsaWorkflowTestPanelElement>;
+            "x6-designer": LocalJSX.X6Designer & JSXBase.HTMLAttributes<HTMLX6DesignerElement>;
         }
     }
 }

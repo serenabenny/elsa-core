@@ -1,11 +1,12 @@
 import {Component, h, Prop, getAssetPath} from '@stencil/core';
 import {loadTranslations} from "../../../i18n/i18n-loader";
 import {resources} from "./localizations";
-import {i18n} from "i18next";
+import {i18n, t} from "i18next";
 import {GetIntlMessage} from "../../../i18n/intl-message";
 import Tunnel from "../../../../data/dashboard";
 import {EventTypes, ConfigureDashboardMenuContext} from '../../../../models';
 import {eventBus} from '../../../../services';
+import { DropdownButtonItem, DropdownButtonOrigin } from '../../../controls/elsa-dropdown-button/models';
 
 @Component({
   tag: 'elsa-studio-dashboard',
@@ -32,6 +33,7 @@ export class ElsaStudioDashboard {
         ['workflow-definitions/:id', 'elsa-studio-workflow-definitions-edit'],
         ['workflow-instances', 'elsa-studio-workflow-instances-list', true],
         ['workflow-instances/:id', 'elsa-studio-workflow-instances-view'],
+        ['oauth2-authorized', 'elsa-oauth2-authorized', true],
       ]
     }
   };
@@ -85,10 +87,11 @@ export class ElsaStudioDashboard {
                   </div>
                 </div>
               </div>
+              <elsa-user-context-menu></elsa-user-context-menu>
             </div>
           </div>
-        </nav>
 
+        </nav>
         <main>
           <stencil-router>
             <stencil-route-switch scrollTopOffset={0}>
@@ -96,9 +99,9 @@ export class ElsaStudioDashboard {
             </stencil-route-switch>
           </stencil-router>
         </main>
+
       </div>
     );
   }
 }
-
 Tunnel.injectProps(ElsaStudioDashboard, ['culture', 'basePath']);

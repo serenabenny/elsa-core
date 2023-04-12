@@ -36,7 +36,6 @@ using Elsa.Services.WorkflowContexts;
 using Elsa.Services.Workflows;
 using Elsa.Services.WorkflowStorage;
 using Elsa.StartupTasks;
-using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Newtonsoft.Json;
@@ -90,6 +89,11 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddWorkflowsCore()
                 .AddConfiguration()
                 .AddCoreActivities();
+
+            if (options.UseTenantSignaler)
+            {
+                services.AddScoped<ISignaler, TenantSignaler>();
+            }
 
             services
                 .Decorate<IWorkflowDefinitionStore, InitializingWorkflowDefinitionStore>()
@@ -190,8 +194,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddActivityTypeProvider<TypeBasedActivityProvider>()
                 .AddTransient<ICreatesWorkflowExecutionContextForWorkflowBlueprint, WorkflowExecutionContextForWorkflowBlueprintFactory>()
                 .AddTransient<ICreatesActivityExecutionContextForActivityBlueprint, ActivityExecutionContextForActivityBlueprintFactory>()
-                .AddTransient<IGetsStartActivities, GetsStartActivitiesProvider>()
-                ;
+                .AddTransient<IGetsStartActivities, GetsStartActivitiesProvider>();
 
             // Data Protection.
             services.AddDataProtection();
@@ -250,8 +253,12 @@ namespace Microsoft.Extensions.DependencyInjection
                 .AddBookmarkProvider<RunWorkflowBookmarkProvider>();
 
             // Mediator.
-            services
-                .AddMediatR(mediatr => mediatr.AsScoped(), typeof(IActivity), typeof(LogWorkflowExecution));
+            services.AddMediatR(cfg =>
+            {
+                cfg.Lifetime = ServiceLifetime.Scoped;
+                cfg.RegisterServicesFromAssemblyContaining<IActivity>();
+                cfg.RegisterServicesFromAssemblyContaining<LogWorkflowExecution>();
+            });
 
             // Service Bus.
             services

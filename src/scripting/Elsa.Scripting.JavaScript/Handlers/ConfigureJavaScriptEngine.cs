@@ -66,7 +66,8 @@ namespace Elsa.Scripting.JavaScript.Handlers
             engine.SetValue("jsonDecode", (Func<string, object?>)JsonConvert.DeserializeObject);
             engine.SetValue("base64Encode", (Func<string, string>)Extensions.StringExtensions.ToBase64);
             engine.SetValue("base64Decode", (Func<string, string>)Extensions.StringExtensions.FromBase64);
-
+            engine.SetValue("addJournal", (Action<string, object>)((name, value) => activityExecutionContext.JournalData.Add(name,value)));
+            
             if (_scriptOptions.EnableConfigurationAccess)
                 engine.SetValue("getConfig", (Func<string, object?>)(name => _configuration.GetSection(name).Value));
 
@@ -119,10 +120,21 @@ namespace Elsa.Scripting.JavaScript.Handlers
         private object? ProcessVariable(object? value) =>
             value switch
             {
-                JArray jArray => jArray.Select(x => x.ToObject<ExpandoObject>()).ToList(),
+                JArray jArray => jArray.Select(ProcessVariable).ToList(),
                 JObject jObject => jObject.ToObject<ExpandoObject>(),
                 ExpandoObject expandoObject => JObject.FromObject(expandoObject),
                 ICollection<ExpandoObject> expandoObjects => new JArray(expandoObjects.Select(JObject.FromObject)),
+                JToken jToken => jToken.Type switch
+                {
+                  JTokenType.Boolean => jToken.Value<bool>(),
+                  JTokenType.Bytes => jToken.Value<byte[]>(),
+                  JTokenType.Date => jToken.Value<DateTimeOffset>(),
+                  JTokenType.Float => jToken.Value<float>(),
+                  JTokenType.Guid => jToken.Value<Guid>(),
+                  JTokenType.Integer => jToken.Value<int>(),
+                  JTokenType.Object => jToken.ToObject<ExpandoObject>(),
+                  _ => jToken.ToString()
+                },
                 _ => value
             };
 
@@ -137,7 +149,7 @@ namespace Elsa.Scripting.JavaScript.Handlers
             {
                 var activityType = await _activityTypeService.GetActivityTypeAsync(activity.Type, cancellationToken);
                 var activityDescriptor = await _activityTypeService.DescribeActivityType(activityType, cancellationToken);
-                var outputProperties = activityDescriptor.OutputProperties;
+                var outputProperties = activityDescriptor.OutputProperties.Where(x => x.IsBrowsable is true or null);
                 var storageProviderLookup = activity.PropertyStorageProviders;
                 var activityModel = new Dictionary<string, object?>();
                 var storageContext = new WorkflowStorageContext(workflowInstance, activity.Id);
